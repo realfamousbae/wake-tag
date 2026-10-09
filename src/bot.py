@@ -1,6 +1,6 @@
 from logging import Logger
 from telethon import TelegramClient
-from telethon.events import NewMessage
+from telethon.events import ChatAction, NewMessage
 
 from .config import Config
 
@@ -93,6 +93,19 @@ class TelegramBot:
                     await sleep(error.seconds)
                     await event.respond(chunk)
                 await sleep(1)
+
+        @self.client.on(ChatAction)
+        async def added_to_chat(event) -> None:
+            if not (event.user_added or event.user_joined) or self.me.id not in (event.user_ids or []):
+                return
+
+            text = "Привет! Я упоминаю всех участников чата по команде /all."
+            permissions = await self.client.get_permissions(event.chat_id, self.me)
+
+            if not permissions.is_admin:
+                text += "\n\nЧтобы я мог получать список участников, назначьте меня администратором."
+
+            await event.respond(text)
 
         @self.client.on(NewMessage(pattern="^/start$", incoming=True))
         @self.client.on(NewMessage(pattern=f"^/start@{escape(self.me.username)}$", incoming=True))
