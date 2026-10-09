@@ -11,6 +11,8 @@ async def main() -> None:
 
     bot = TelegramBot(logger, config.data)
 
+    await bot.client.start(bot_token=config.data["tech"]["bot_token"])
+
     async with bot.client:
         await bot.handlers()
         await bot.run()

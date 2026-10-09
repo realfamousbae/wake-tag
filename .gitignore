@@ -5,3 +5,7 @@
 /bot.session*
 
 .idea
+
+.env
+
+.pytest_cache
